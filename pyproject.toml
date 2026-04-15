@@ -12,6 +12,12 @@ dependencies = [
     "pydantic>=2.8,<3.0",
 ]
 
+[tool.poetry]
+name = "token-monitor"
+version = "0.1.0"
+description = ""
+authors = ["You"]
+package-mode = false
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
