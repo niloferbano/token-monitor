@@ -91,17 +91,7 @@ Requests are deduplicated by `(tenant_id, request_id)`.
 
 ## API Endpoints
 
-### `GET /`
 
-Basic service metadata.
-
-Example response:
-
-```json
-{
-  "service": "token-monitor",
-  "status": "ok"
-}
 ```
 
 ### `GET /health`
@@ -267,6 +257,12 @@ curl -X POST http://127.0.0.1:8000/quota/check \
     "now_sec": 100
   }'
 ```
+
+## Performance Characteristics
+
+- O(1) time complexity per quota check using a ring-buffer design
+- constant memory per tenant proportional to `window_seconds`
+- sub-10ms admission decisions in the hot path (in-memory)
 
 ## Limitations
 
