@@ -1,7 +1,8 @@
 import time
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app.auth.dependencies import verify_api_key
 from app.core.schema import (
     HealthResponse,
     QuotaCheckRequest,
@@ -16,7 +17,10 @@ router = APIRouter(prefix="/quota")
 
 
 @router.post("/check", response_model=QuotaCheckResponse)
-async def check_quota(request: QuotaCheckRequest) -> QuotaCheckResponse:
+async def check_quota(
+    request: QuotaCheckRequest,
+    _: str = Depends(verify_api_key),
+) -> QuotaCheckResponse:
     now_sec = request.now_sec if request.now_sec is not None else int(time.time())
 
     decision = quota_manager.check_admission(
@@ -46,7 +50,10 @@ async def check_quota(request: QuotaCheckRequest) -> QuotaCheckResponse:
 
 
 @router.post("/tenants", response_model=TenantConfigResponse, status_code=201)
-async def register_tenant(request: RegisterTenantRequest) -> TenantConfigResponse:
+async def register_tenant(
+    request: RegisterTenantRequest,
+    _: str = Depends(verify_api_key),
+) -> TenantConfigResponse:
     try:
         quota_manager.register_tenant(
             tenant_id=request.tenant_id,
