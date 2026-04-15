@@ -91,8 +91,13 @@ Requests are deduplicated by `(tenant_id, request_id)`.
 
 ## API Endpoints
 
+All protected quota endpoints require an API key header:
 
+```http
+x-api-key: dev-secret-key
 ```
+
+The default local key is `dev-secret-key`. You can override it with the `TOKEN_MONITOR_API_KEY` environment variable.
 
 ### `GET /health`
 
@@ -110,6 +115,12 @@ Example response:
 ### `POST /quota/tenants`
 
 Registers a tenant.
+
+Required header:
+
+```http
+x-api-key: dev-secret-key
+```
 
 Request body:
 
@@ -134,6 +145,12 @@ Response:
 ### `POST /quota/check`
 
 Checks whether a request fits within the tenant budget.
+
+Required header:
+
+```http
+x-api-key: dev-secret-key
+```
 
 Request body:
 
@@ -193,13 +210,13 @@ If you are using the local virtual environment already present in the repo:
 Using uvicorn:
 
 ```bash
-.venv/bin/uvicorn app.main:app --reload
+TOKEN_MONITOR_API_KEY=dev-secret-key .venv/bin/uvicorn app.main:app --reload
 ```
 
 Or with Python:
 
 ```bash
-.venv/bin/python -m app.main
+TOKEN_MONITOR_API_KEY=dev-secret-key .venv/bin/python -m app.main
 ```
 
 The default app address is `http://127.0.0.1:8000`.
@@ -225,6 +242,7 @@ Register a tenant:
 ```bash
 curl -X POST http://127.0.0.1:8000/quota/tenants \
   -H "Content-Type: application/json" \
+  -H "x-api-key: dev-secret-key" \
   -d '{
     "tenant_id": "tenant-a",
     "budget_tokens": 10,
@@ -237,6 +255,7 @@ Check quota:
 ```bash
 curl -X POST http://127.0.0.1:8000/quota/check \
   -H "Content-Type: application/json" \
+  -H "x-api-key: dev-secret-key" \
   -d '{
     "tenant_id": "tenant-a",
     "request_id": "req-1",
@@ -250,6 +269,7 @@ Submit the same request again to observe deduplication:
 ```bash
 curl -X POST http://127.0.0.1:8000/quota/check \
   -H "Content-Type: application/json" \
+  -H "x-api-key: dev-secret-key" \
   -d '{
     "tenant_id": "tenant-a",
     "request_id": "req-1",
